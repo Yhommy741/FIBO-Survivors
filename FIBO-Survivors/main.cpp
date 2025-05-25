@@ -16,6 +16,34 @@ bool rectsIntersect(const sf::FloatRect& a, const sf::FloatRect& b) {
         (a.position.y < b.position.y + b.size.y) && (a.position.y + a.size.y > b.position.y);
 }
 
+// --- Skill class ---
+class Skill {
+public:
+    Skill(float cooldown, int frameCount)
+        : cooldown(cooldown), frameCount(frameCount), timer(0.f), frame(1) {
+    }
+
+    void update(float dt) {
+        timer += dt;
+        if (timer >= 1.0f) {
+            timer -= 1.0f;
+            frame++;
+            if (frame > frameCount) frame = 1;
+        }
+    }
+    bool isReady() const { return frame == 1 && timer < 0.1f; }
+    int getFrame() const { return frame; }
+    int getFrameCount() const { return frameCount; }
+    float getCooldown() const { return cooldown; }
+    float getTimeLeft() const { return cooldown - ((frame - 1) + timer); }
+    void reset() { timer = 0.f; frame = 1; }
+private:
+    float cooldown;
+    int frameCount;
+    float timer;
+    int frame;
+};
+
 // --- Bullet class ---
 class Bullet {
 public:
@@ -25,14 +53,16 @@ public:
         const sf::Vector2f& targetPos,
         float speed,
         float baseDamage,
-        float damageModifier = 0.0f
+        float damageModifier = 0.0f,
+        bool isSkillBullet = false // เพิ่ม parameter
     ) : sprite(texture),
         position(startPos),
         speed(speed),
         damage(baseDamage + damageModifier),
         distanceTraveled(0.0f),
         animationFrame(0),
-        animationTimer(0.0f)
+        animationTimer(0.0f),
+        isSkillBullet(isSkillBullet) // เพิ่ม member
     {
         sprite.setTextureRect(sf::IntRect({ 0, 0 }, { 16, 16 }));
         sprite.setOrigin({ 8.f, 8.f });
@@ -87,6 +117,8 @@ public:
         return box;
     }
 
+    bool isSkill() const { return isSkillBullet; } // เพิ่ม getter
+
 private:
     sf::Sprite sprite;
     sf::Vector2f position;
@@ -96,6 +128,7 @@ private:
     float distanceTraveled;
     int animationFrame;
     float animationTimer;
+    bool isSkillBullet; // เพิ่ม member
 };
 
 // --- Monster (Capa) class ---
@@ -261,6 +294,56 @@ int main(int argc, char* argv[])
     // Window and player setup
     sf::RenderWindow window(sf::VideoMode({ 1920, 1080 }), "FIBO Survivors");
 
+    // --- Load sound effect buffer (quack) ---
+    std::string quackFile = "pain_Quack.wav";
+    std::filesystem::path quackPath = exeDir / ".." / ".." / "assets" / "entity" / "sound" / quackFile;
+    quackPath = std::filesystem::weakly_canonical(quackPath);
+    sf::SoundBuffer quackBuffer;
+    if (!quackBuffer.loadFromFile(quackPath.string())) {
+        std::cerr << "Failed to load quack sound: " << quackPath << std::endl;
+    }
+    sf::Sound quackSound{ quackBuffer };
+    quackSound.setVolume(100.f); // ปรับความดัง SFX
+
+
+    // --- Load sound effect buffer (fire) ---
+    std::string fireSfxFile = "fire_torch_whoosh.wav";
+    std::filesystem::path fireSfxPath = exeDir / ".." / ".." / "assets" / "entity" / "sound" / fireSfxFile;
+    fireSfxPath = std::filesystem::weakly_canonical(fireSfxPath);
+    sf::SoundBuffer fireSfxBuffer;
+    if (!fireSfxBuffer.loadFromFile(fireSfxPath.string())) {
+        std::cerr << "Failed to load fire SFX: " << fireSfxPath << std::endl;
+    }
+    sf::Sound fireSfx{ fireSfxBuffer };
+    fireSfx.setVolume(60.f); // ปรับความดังตามต้องการ
+
+    // --- Load sound effect buffer (skill) ---
+    std::string skillSfxFile = "skill_sfx.wav";
+    std::filesystem::path skillSfxPath = exeDir / ".." / ".." / "assets" / "entity" / "sound" / skillSfxFile;
+    skillSfxPath = std::filesystem::weakly_canonical(skillSfxPath);
+    sf::SoundBuffer skillSfxBuffer;
+    if (!skillSfxBuffer.loadFromFile(skillSfxPath.string())) {
+        std::cerr << "Failed to load skill SFX: " << skillSfxPath << std::endl;
+    }
+    sf::Sound skillSfx{ skillSfxBuffer };
+    skillSfx.setVolume(80.f); // ปรับความดังตามต้องการ
+
+    // --- Load and play BGM ---
+    std::string bgmFile = "Path_Goblin_King.wav";
+    std::filesystem::path bgmPath = exeDir / ".." / ".." / "assets" / "entity" / "sound" / bgmFile;
+    bgmPath = std::filesystem::weakly_canonical(bgmPath);
+
+    sf::Music bgm;
+    if (!bgm.openFromFile(bgmPath.string())) {
+        std::cerr << "Failed to load BGM: " << bgmPath << std::endl;
+        return -1;
+    }
+    bgm.setVolume(80.f);
+    bgm.setLooping(true); // ให้เพลงวน
+    bgm.play();
+
+
+
     // --- Custom Cursor Setup ---
     std::string cursorFiles[3] = { "cursor_blue.png", "cursor_amethyst.png", "cursor_red.png" };
     sf::Texture cursorTextures[3];
@@ -324,7 +407,7 @@ int main(int argc, char* argv[])
     int bulletType = 1;
     bool spacePressedLastFrame = false;
 
-    float baseFireRate = 1.5f;
+    float baseFireRate = 1.0f;
     float fireRateModifier = 0.0f;
     float baseDamage = 10.0f;
     float damageModifier = 0.0f;
@@ -337,7 +420,7 @@ int main(int argc, char* argv[])
     int currentFrame = 0;
     const int numFrames = 4;
     bool facingRight = true;
-
+        
     // --- Monster system setup ---
     sf::Texture capaTexture;
     if (!capaTexture.loadFromFile(capaPath.string())) {
@@ -346,8 +429,26 @@ int main(int argc, char* argv[])
     }
     std::vector<Monster> monsters;
     sf::Clock monsterSpawnClock;
-    const float monsterSpawnInterval = 1.5f;
+    const float monsterSpawnInterval = 0.5f;
     const int maxMonsters = 10;
+
+    // --- Skill system setup ---
+    Skill skill(6.0f, 6);
+    skill.update(1.1f); // ทำให้เริ่มที่เฟรม 2 (คูลดาวน์ทันที)
+    sf::Clock skillClock;
+    bool skillBulletsSpawned = false; // เพิ่ม flag
+
+    // --- Skill UI SpriteSheet ---
+    sf::Texture skillUiTexture;
+    std::filesystem::path skillUiPath = exeDir / ".." / ".." / "assets" / "entity" / "skill" / "Bullet_Bluefire_Amethyst_CD.png";
+    skillUiPath = std::filesystem::weakly_canonical(skillUiPath);
+    if (!skillUiTexture.loadFromFile(skillUiPath.string())) {
+        std::cerr << "Failed to load skill UI texture: " << skillUiPath << std::endl;
+        return -1;
+    }
+    const int skillUiFrameCount = 6;
+    const int skillUiFrameWidth = skillUiTexture.getSize().x;
+    const int skillUiFrameHeight = skillUiTexture.getSize().y / skillUiFrameCount;
 
     // Player position
     sf::Vector2f playerPosition = window.getView().getCenter();
@@ -363,6 +464,38 @@ int main(int argc, char* argv[])
                 window.close();
         }
         window.clear(sf::Color::Black);
+
+        // --- Skill update ---
+        float dtSkill = skillClock.restart().asSeconds();
+        skill.update(dtSkill);
+
+        // --- Skill: Shoot purple bullets around player every 6 seconds ---
+        // ยิงแค่ครั้งเดียวต่อรอบ (เฉพาะ frame 1)
+        if (skill.isReady() && !skillBulletsSpawned) {
+            const int bulletCount = 8;
+            float angleStep = 2 * 3.14159265f / bulletCount;
+            float radius = 60.f;
+            for (int i = 0; i < bulletCount; ++i) {
+                float angle = i * angleStep;
+                sf::Vector2f dir(std::cos(angle), std::sin(angle));
+                sf::Vector2f bulletStart = playerPosition + dir * radius;
+                sf::Vector2f bulletTarget = playerPosition + dir * (radius + 10.f);
+                bullets.emplace_back(
+                    bulletTextureAmethyst,
+                    bulletStart,
+                    bulletTarget,
+                    bulletSpeed,
+                    baseDamage,
+                    damageModifier,
+                    true // isSkillBullet
+                );
+            }
+            skillSfx.play();
+            skillBulletsSpawned = true;
+        }
+        if (skill.getFrame() != 1) {
+            skillBulletsSpawned = false;
+        }
 
         // Handle bullet type switching with Spacebar
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)) {
@@ -430,10 +563,11 @@ int main(int argc, char* argv[])
         int py = static_cast<int>(std::floor(playerPosition.y / tileSize));
         for (int y = -N; y <= N; ++y) {
             for (int x = -N; x <= N; ++x) {
-                tile.setPosition(
-                    { static_cast<float>((px + x) * tileSize),
-                     static_cast<float>((py + y) * tileSize) }
-                );
+                tile.setPosition({
+                     static_cast<float>((px + x) * tileSize),
+                     static_cast<float>((py + y) * tileSize)
+                    });
+
                 window.draw(tile);
             }
         }
@@ -476,7 +610,12 @@ int main(int argc, char* argv[])
             for (auto bIt = bullets.begin(); bIt != bullets.end(); ) {
                 if (mIt->checkBulletCollision(bIt->getHitbox())) {
                     mIt->onHitByBullet();
-                    bIt = bullets.erase(bIt);
+                    // ถ้าไม่ใช่ skill bullet ให้ลบ
+                    if (!bIt->isSkill()) {
+                        bIt = bullets.erase(bIt);
+                    } else {
+                        ++bIt;
+                    }
                 }
                 else {
                     ++bIt;
@@ -514,8 +653,10 @@ int main(int argc, char* argv[])
                 mouseWorld,
                 bulletSpeed,
                 baseDamage,
-                damageModifier
+                damageModifier,
+                false // ไม่ใช่ skill bullet
             );
+            fireSfx.play();
             fireClock.restart();
         }
 
@@ -537,9 +678,14 @@ int main(int argc, char* argv[])
             m.draw(window);
 
         // --- Player highlight on hit ---
-        if (playerHit) {
+        static bool playerWasHitLastFrame = false;
+        if (playerHit && !playerWasHitLastFrame) {
+			quackSound.play(); // เล่นเสียงเมื่อโดน
             playerHighlightTimer = 0.2f;
+           
         }
+        playerWasHitLastFrame = playerHit;
+
         if (playerHighlightTimer > 0.f) {
             playerSprite.setColor(sf::Color(255, 80, 80));
             playerHighlightTimer -= dt;
@@ -553,6 +699,31 @@ int main(int argc, char* argv[])
         view.setCenter(playerPosition);
         window.setView(view);
         window.draw(playerSprite);
+
+        // --- Draw skill cooldown UI (top-left, not at edge) ---
+        {
+            float margin = 40.f;
+            float size = 40.f;
+            float uiX = view.getCenter().x - view.getSize().x / 2.f + margin;
+            float uiY = view.getCenter().y - view.getSize().y / 2.f + margin;
+
+            // ตรวจสอบขนาด texture
+            if (skillUiTexture.getSize().x < 16 || skillUiTexture.getSize().y < 16 * skill.getFrameCount()) {
+                std::cerr << "Skill UI texture size is too small! ("
+                    << skillUiTexture.getSize().x << "x" << skillUiTexture.getSize().y << ")" << std::endl;
+            }
+            else {
+                int yOffset = (skill.getFrame() - 1) * 16;
+                sf::Sprite skillUiSprite(skillUiTexture);
+                skillUiSprite.setTextureRect(sf::IntRect({ 0, yOffset }, { 16, 16 }));
+                skillUiSprite.setPosition({ uiX, uiY });
+                skillUiSprite.setScale({ 4.f, 4.f });
+
+                // สามารถปรับสีหรือเอฟเฟกต์ได้ตามต้องการ
+                skillUiSprite.setColor(sf::Color(255, 255, 255, 255));
+                window.draw(skillUiSprite);
+            }
+        }
 
         // --- Draw custom cursor ---
         int cursorIndex = bulletType - 1;
