@@ -10,255 +10,15 @@
 #include <cmath>
 #include <random>
 
+#include "Skill.h"
+#include "Bullet.h"
+#include "Monster.h"
+#include "helper.h"
+
 // --- Rects Intersect helper for SFML 3.x ---
 bool rectsIntersect(const sf::FloatRect& a, const sf::FloatRect& b) {
     return (a.position.x < b.position.x + b.size.x) && (a.position.x + a.size.x > b.position.x) &&
         (a.position.y < b.position.y + b.size.y) && (a.position.y + a.size.y > b.position.y);
-}
-
-// --- Skill class ---
-class Skill {
-public:
-    Skill(float cooldown, int frameCount)
-        : cooldown(cooldown), frameCount(frameCount), timer(0.f), frame(1) {
-    }
-
-    void update(float dt) {
-        timer += dt;
-        if (timer >= 1.0f) {
-            timer -= 1.0f;
-            frame++;
-            if (frame > frameCount) frame = 1;
-        }
-    }
-    bool isReady() const { return frame == 1 && timer < 0.1f; }
-    int getFrame() const { return frame; }
-    int getFrameCount() const { return frameCount; }
-    float getCooldown() const { return cooldown; }
-    float getTimeLeft() const { return cooldown - ((frame - 1) + timer); }
-    void reset() { timer = 0.f; frame = 1; }
-private:
-    float cooldown;
-    int frameCount;
-    float timer;
-    int frame;
-};
-
-// --- Bullet class ---
-class Bullet {
-public:
-    Bullet(
-        const sf::Texture& texture,
-        const sf::Vector2f& startPos,
-        const sf::Vector2f& targetPos,
-        float speed,
-        float baseDamage,
-        float damageModifier = 0.0f,
-        bool isSkillBullet = false // เพิ่ม parameter
-    ) : sprite(texture),
-        position(startPos),
-        speed(speed),
-        damage(baseDamage + damageModifier),
-        distanceTraveled(0.0f),
-        animationFrame(0),
-        animationTimer(0.0f),
-        isSkillBullet(isSkillBullet) // เพิ่ม member
-    {
-        sprite.setTextureRect(sf::IntRect({ 0, 0 }, { 16, 16 }));
-        sprite.setOrigin({ 8.f, 8.f });
-        sprite.setPosition(position);
-        sprite.setScale({ 7.f, 7.f });
-
-        // Calculate normalized direction vector
-        sf::Vector2f dir = targetPos - startPos;
-        float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
-        if (len != 0)
-            direction = dir / len;
-        else
-            direction = { 1.f, 0.f };
-
-        float angle = std::atan2(direction.y, direction.x) * 180.f / 3.14159265f + 180.f;
-        sprite.setRotation(sf::degrees(angle));
-    }
-
-    void update(float dt) {
-        sf::Vector2f move = direction * speed * dt;
-        position += move;
-        distanceTraveled += std::sqrt(move.x * move.x + move.y * move.y);
-        sprite.setPosition(position);
-
-        animationTimer += dt;
-        if (animationTimer > 0.08f) {
-            animationFrame = (animationFrame + 1) % 4;
-            sprite.setTextureRect(sf::IntRect({ 0, animationFrame * 16 }, { 16, 16 }));
-            animationTimer = 0.0f;
-        }
-
-        float angle = std::atan2(direction.y, direction.x) * 180.f / 3.14159265f + 180.f;
-        sprite.setRotation(sf::degrees(angle));
-    }
-
-    void draw(sf::RenderWindow& window) const {
-        window.draw(sprite);
-    }
-
-    bool isAlive() const {
-        return distanceTraveled < 1000.f;
-    }
-
-    // Hitbox เล็กลง (กลางกระสุน)
-    sf::FloatRect getHitbox() const {
-        sf::FloatRect box = sprite.getGlobalBounds();
-        float shrink = 0.4f; // shrink 40%
-        box.position.x += box.size.x * shrink / 2.f;
-        box.position.y += box.size.y * shrink / 2.f;
-        box.size.x *= (1.f - shrink);
-        box.size.y *= (1.f - shrink);
-        return box;
-    }
-
-    bool isSkill() const { return isSkillBullet; } // เพิ่ม getter
-
-private:
-    sf::Sprite sprite;
-    sf::Vector2f position;
-    sf::Vector2f direction;
-    float speed;
-    float damage;
-    float distanceTraveled;
-    int animationFrame;
-    float animationTimer;
-    bool isSkillBullet; // เพิ่ม member
-};
-
-// --- Monster (Capa) class ---
-class Monster {
-public:
-    Monster(const sf::Texture& texture, const sf::Vector2f& startPos)
-        : sprite(texture), position(startPos), hitCount(0), highlightTimer(0.f), dead(false), deathTimer(0.f),
-        animFrame(0), animTimer(0.f)
-    {
-        sprite.setTexture(texture);
-        sprite.setTextureRect(sf::IntRect({ 0, 0 }, { 32, 32 }));
-        sprite.setOrigin({ 16.f, 16.f });
-        sprite.setPosition(position);
-        sprite.setScale({ 4.f, 4.f });
-    }
-
-    void update(float dt, const sf::Vector2f& playerPos) {
-        if (dead) {
-            if (deathTimer > 0.f)
-                deathTimer -= dt;
-            return;
-        }
-        // Animation
-        animTimer += dt;
-        if (animTimer > 0.09f) {
-            animFrame = (animFrame + 1) % 8;
-            sprite.setTextureRect(sf::IntRect({ animFrame * 32, 0 }, { 32, 32 }));
-            animTimer = 0.f;
-        }
-        // Move toward player
-        sf::Vector2f dir = playerPos - position;
-        float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
-        if (len > 1e-2f) {
-            dir /= len;
-            position += dir * 200.0f * dt;
-            sprite.setPosition(position);
-        }
-        if (highlightTimer > 0.f)
-            highlightTimer -= dt;
-    }
-
-    void draw(sf::RenderWindow& window) const {
-        if (dead && deathTimer <= 0.f) return;
-        sf::Sprite s = sprite;
-        if (highlightTimer > 0.f || (dead && deathTimer > 0.f)) {
-            s.setColor(sf::Color(255, 80, 80));
-        }
-        window.draw(s);
-    }
-
-    // Hitbox เล็กลง (กลางตัว)
-    sf::FloatRect getHitbox() const {
-        sf::FloatRect box = sprite.getGlobalBounds();
-        float shrink = 0.5f; // shrink 50%
-        box.position.x += box.size.x * shrink / 2.f;
-        box.position.y += box.size.y * shrink / 2.f;
-        box.size.x *= (1.f - shrink);
-        box.size.y *= (1.f - shrink);
-        return box;
-    }
-
-    bool checkPlayerCollision(const sf::FloatRect& playerBounds) {
-        return !dead && rectsIntersect(getHitbox(), playerBounds);
-    }
-
-    bool checkBulletCollision(const sf::FloatRect& bulletBounds) {
-        return !dead && rectsIntersect(getHitbox(), bulletBounds);
-    }
-
-    void onHitPlayer() {
-        hitCount++;
-        highlightTimer = 0.2f;
-        if (hitCount >= 2) {
-            dead = true;
-            deathTimer = 0.5f;
-        }
-    }
-
-    void onHitByBullet() {
-        if (!dead) {
-            dead = true;
-            highlightTimer = 0.5f;
-            deathTimer = 0.5f;
-        }
-    }
-
-    bool isDead() const { return dead && deathTimer <= 0.f; }
-
-private:
-    sf::Sprite sprite;
-    sf::Vector2f position;
-    int hitCount;
-    float highlightTimer;
-    bool dead;
-    float deathTimer;
-    int animFrame;
-    float animTimer;
-};
-
-// สุ่มตำแหน่ง spawn รอบขอบจอ
-sf::Vector2f randomMonsterSpawn(const sf::View& view, float margin = 100.f) {
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
-    std::uniform_real_distribution<float> dist01(0.f, 1.f);
-
-    float left = view.getCenter().x - view.getSize().x / 2.f;
-    float right = view.getCenter().x + view.getSize().x / 2.f;
-    float top = view.getCenter().y - view.getSize().y / 2.f;
-    float bottom = view.getCenter().y + view.getSize().y / 2.f;
-    int edge = static_cast<int>(dist01(gen) * 4);
-    float x, y;
-    switch (edge) {
-    case 0: // top
-        x = left + dist01(gen) * view.getSize().x;
-        y = top - margin;
-        break;
-    case 1: // bottom
-        x = left + dist01(gen) * view.getSize().x;
-        y = bottom + margin;
-        break;
-    case 2: // left
-        x = left - margin;
-        y = top + dist01(gen) * view.getSize().y;
-        break;
-    default: // right
-        x = right + margin;
-        y = top + dist01(gen) * view.getSize().y;
-        break;
-    }
-    return { x, y };
 }
 
 int main(int argc, char* argv[])
@@ -305,7 +65,6 @@ int main(int argc, char* argv[])
     sf::Sound quackSound{ quackBuffer };
     quackSound.setVolume(100.f); // ปรับความดัง SFX
 
-
     // --- Load sound effect buffer (fire) ---
     std::string fireSfxFile = "fire_torch_whoosh.wav";
     std::filesystem::path fireSfxPath = exeDir / ".." / ".." / "assets" / "entity" / "sound" / fireSfxFile;
@@ -315,7 +74,7 @@ int main(int argc, char* argv[])
         std::cerr << "Failed to load fire SFX: " << fireSfxPath << std::endl;
     }
     sf::Sound fireSfx{ fireSfxBuffer };
-    fireSfx.setVolume(60.f); // ปรับความดังตามต้องการ
+    fireSfx.setVolume(40.f); // ปรับความดังตามต้องการ
 
     // --- Load sound effect buffer (skill) ---
     std::string skillSfxFile = "skill_sfx.wav";
@@ -326,7 +85,7 @@ int main(int argc, char* argv[])
         std::cerr << "Failed to load skill SFX: " << skillSfxPath << std::endl;
     }
     sf::Sound skillSfx{ skillSfxBuffer };
-    skillSfx.setVolume(80.f); // ปรับความดังตามต้องการ
+    skillSfx.setVolume(70.f); // ปรับความดังตามต้องการ
 
     // --- Load and play BGM ---
     std::string bgmFile = "Path_Goblin_King.wav";
@@ -338,11 +97,9 @@ int main(int argc, char* argv[])
         std::cerr << "Failed to load BGM: " << bgmPath << std::endl;
         return -1;
     }
-    bgm.setVolume(80.f);
+    bgm.setVolume(100.f);
     bgm.setLooping(true); // ให้เพลงวน
     bgm.play();
-
-
 
     // --- Custom Cursor Setup ---
     std::string cursorFiles[3] = { "cursor_blue.png", "cursor_amethyst.png", "cursor_red.png" };
@@ -420,7 +177,7 @@ int main(int argc, char* argv[])
     int currentFrame = 0;
     const int numFrames = 4;
     bool facingRight = true;
-        
+
     // --- Monster system setup ---
     sf::Texture capaTexture;
     if (!capaTexture.loadFromFile(capaPath.string())) {
@@ -613,7 +370,8 @@ int main(int argc, char* argv[])
                     // ถ้าไม่ใช่ skill bullet ให้ลบ
                     if (!bIt->isSkill()) {
                         bIt = bullets.erase(bIt);
-                    } else {
+                    }
+                    else {
                         ++bIt;
                     }
                 }
@@ -680,9 +438,8 @@ int main(int argc, char* argv[])
         // --- Player highlight on hit ---
         static bool playerWasHitLastFrame = false;
         if (playerHit && !playerWasHitLastFrame) {
-			quackSound.play(); // เล่นเสียงเมื่อโดน
+            quackSound.play(); // เล่นเสียงเมื่อโดน
             playerHighlightTimer = 0.2f;
-           
         }
         playerWasHitLastFrame = playerHit;
 

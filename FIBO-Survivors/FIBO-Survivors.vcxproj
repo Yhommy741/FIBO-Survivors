@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -17,6 +17,19 @@
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\bullet.h" />
+    <ClInclude Include="src\helper.h" />
+    <ClInclude Include="src\monster.h" />
+    <ClInclude Include="src\skill.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\bullet.cpp" />
+    <ClCompile Include="src\helper.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\monster.cpp" />
+    <ClCompile Include="src\skill.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -142,15 +155,6 @@
       <AdditionalLibraryDirectories>$(SolutionDir)dependencies\SFML\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="bullet.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="monster.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="bullet.h" />
-    <ClInclude Include="monster.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
