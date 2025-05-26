@@ -47,9 +47,14 @@ int main(int argc, char* argv[])
     R_bulletbulletPath = std::filesystem::weakly_canonical(R_bulletbulletPath);
 
     // Load monster texture
+        //capa
     std::string capaFile = "Sprite-Capa-stand.png";
     std::filesystem::path capaPath = exeDir / ".." / ".." / "assets" / "entity" / "monster" / capaFile;
     capaPath = std::filesystem::weakly_canonical(capaPath);
+        //IC
+    std::string icFile = "Sprite-IC-stand.png";
+    std::filesystem::path icPath = exeDir / ".." / ".." / "assets" / "entity" / "monster" / icFile;
+    icPath = std::filesystem::weakly_canonical(icPath);
 
     // Window and player setup
     sf::RenderWindow window(sf::VideoMode({ 1920, 1080 }), "FIBO Survivors");
@@ -63,7 +68,7 @@ int main(int argc, char* argv[])
         std::cerr << "Failed to load quack sound: " << quackPath << std::endl;
     }
     sf::Sound quackSound{ quackBuffer };
-    quackSound.setVolume(100.f); // ปรับความดัง SFX
+    quackSound.setVolume(80.f); // ปรับความดัง SFX
 
     // --- Load sound effect buffer (fire) ---
     std::string fireSfxFile = "fire_torch_whoosh.wav";
@@ -85,7 +90,7 @@ int main(int argc, char* argv[])
         std::cerr << "Failed to load skill SFX: " << skillSfxPath << std::endl;
     }
     sf::Sound skillSfx{ skillSfxBuffer };
-    skillSfx.setVolume(70.f); // ปรับความดังตามต้องการ
+    skillSfx.setVolume(40.f); // ปรับความดังตามต้องการ
 
     // --- Load and play BGM ---
     std::string bgmFile = "Path_Goblin_King.wav";
@@ -97,7 +102,7 @@ int main(int argc, char* argv[])
         std::cerr << "Failed to load BGM: " << bgmPath << std::endl;
         return -1;
     }
-    bgm.setVolume(100.f);
+    bgm.setVolume(60.f);
     bgm.setLooping(true); // ให้เพลงวน
     bgm.play();
 
@@ -179,15 +184,20 @@ int main(int argc, char* argv[])
     bool facingRight = true;
 
     // --- Monster system setup ---
-    sf::Texture capaTexture;
+    sf::Texture capaTexture, icTexture;
     if (!capaTexture.loadFromFile(capaPath.string())) {
         std::cerr << "Failed to load monster texture: " << capaPath << std::endl;
+        return -1;
+    }
+    if (!icTexture.loadFromFile(icPath.string())) {
+        std::cerr << "Failed to load IC monster texture: " << icPath << std::endl;
         return -1;
     }
     std::vector<Monster> monsters;
     sf::Clock monsterSpawnClock;
     const float monsterSpawnInterval = 0.5f;
     const int maxMonsters = 10;
+
 
     // --- Skill system setup ---
     Skill skill(6.0f, 6);
@@ -333,10 +343,19 @@ int main(int argc, char* argv[])
         if (monsterSpawnClock.getElapsedTime().asSeconds() > monsterSpawnInterval && monsters.size() < maxMonsters) {
             sf::Vector2f spawnPos = randomMonsterSpawn(window.getView());
             if (std::hypot(spawnPos.x - playerPosition.x, spawnPos.y - playerPosition.y) > 300.f) {
-                monsters.emplace_back(capaTexture, spawnPos);
+                // สุ่มชนิดมอนสเตอร์
+                if (rand() % 2 == 0) {
+                    monsters.emplace_back(icTexture, spawnPos, sf::Vector2i(32, 32), 5);
+                    // Capa
+                }
+                else {
+                    monsters.emplace_back(capaTexture, spawnPos, sf::Vector2i(32, 32), 8);
+                    // IC
+                }
                 monsterSpawnClock.restart();
             }
         }
+
 
         // --- Update & draw monsters ---
         static sf::Clock monsterAnimClock;

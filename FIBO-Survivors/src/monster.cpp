@@ -1,13 +1,13 @@
 #include "Monster.h"
 #include <cmath>
 
-Monster::Monster(const sf::Texture& texture, const sf::Vector2f& startPos)
+Monster::Monster(const sf::Texture& texture, const sf::Vector2f& startPos, sf::Vector2i frameSize, int numFrames)
     : sprite(texture), position(startPos), hitCount(0), highlightTimer(0.f), dead(false), deathTimer(0.f),
-    animFrame(0), animTimer(0.f)
+    animFrame(0), animTimer(0.f), frameSize(frameSize), numFrames(numFrames)
 {
     sprite.setTexture(texture);
-    sprite.setTextureRect(sf::IntRect({ 0, 0 }, { 32, 32 }));
-    sprite.setOrigin({ 16.f, 16.f });
+    sprite.setTextureRect(sf::IntRect({ 0, 0 }, frameSize));
+    sprite.setOrigin({ frameSize.x / 2.f, frameSize.y / 2.f });
     sprite.setPosition(position);
     sprite.setScale({ 4.f, 4.f });
 }
@@ -20,8 +20,8 @@ void Monster::update(float dt, const sf::Vector2f& playerPos) {
     }
     animTimer += dt;
     if (animTimer > 0.09f) {
-        animFrame = (animFrame + 1) % 8;
-        sprite.setTextureRect(sf::IntRect({ animFrame * 32, 0 }, { 32, 32 }));
+        animFrame = (animFrame + 1) % numFrames;
+        sprite.setTextureRect(sf::IntRect({ animFrame * frameSize.x, 0 }, frameSize));
         animTimer = 0.f;
     }
     sf::Vector2f dir = playerPos - position;
