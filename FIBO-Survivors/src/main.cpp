@@ -173,7 +173,8 @@ int main(int argc, char* argv[])
     float fireRateModifier = 0.0f;
     float baseDamage = 10.0f;
     float damageModifier = 0.0f;
-    float bulletSpeed = 200.0f;
+    float basebulletSpeed = 200.0f;
+    float bulletSpeedModifier = 100.0f;
 
     sf::Clock fireClock;
     sf::Clock playerAnimClock;
@@ -251,7 +252,7 @@ int main(int argc, char* argv[])
                     bulletTextureAmethyst,
                     bulletStart,
                     bulletTarget,
-                    bulletSpeed,
+                    basebulletSpeed,
                     baseDamage,
                     damageModifier,
                     true // isSkillBullet
@@ -428,7 +429,7 @@ int main(int argc, char* argv[])
                 *currentBulletTexture,
                 bulletStart,
                 mouseWorld,
-                bulletSpeed,
+                basebulletSpeed+bulletSpeedModifier,
                 baseDamage,
                 damageModifier,
                 false // ไม่ใช่ skill bullet
