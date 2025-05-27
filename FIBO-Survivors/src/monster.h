@@ -4,11 +4,16 @@
 #include <SFML/System/Vector2.hpp>
 #include <cmath> // For std::sqrt
 
-class Monster : public Entity {
-private:
+struct MonsterInfo {
+    std::string fileName;
+    int numFrames;
+};
 
+MonsterInfo getRandomMonsterInfo();
+
+class Monster : public Entity {
 public:
-    Monster(std::string fileName_, const std::filesystem::path& exeDir_, int numFrames);
+    Monster(const std::string& fileName, const std::filesystem::path& exeDir, int numFrames);
 
     void load() override;
     void randomSpawn(const sf::Vector2f& playerPos, float spawnRadius = 600.f);

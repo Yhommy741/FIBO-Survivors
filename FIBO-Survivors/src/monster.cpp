@@ -2,18 +2,17 @@
 #include <iostream>
 #include <random>
 #include <cmath>
+#include <array>
 
-Monster::Monster(std::string fileName_, const std::filesystem::path& exeDir_, int numFrames)
-    : Entity(fileName_, exeDir_, numFrames) {
+Monster::Monster(const std::string& fileName, const std::filesystem::path& exeDir, int numFrames)
+    : Entity(fileName, exeDir, numFrames)
+{
     load();
 }
 
 void Monster::load() {
-    // ??????? assets/entity/monster/
-    std::filesystem::path assetPath = exeDir / ".." / ".." / "assets" / "entity" / "monster" / "Sprite-Capa-stand.png";
+    std::filesystem::path assetPath = exeDir / ".." / ".." / "assets" / "entity" / "monster" / fileName;
     assetPath = std::filesystem::weakly_canonical(assetPath);
-
-    std::cout << "Loading monster from: " << assetPath << std::endl;
 
     if (!texture.loadFromFile(assetPath.string())) {
         std::cerr << "Failed to load monster texture: " << assetPath << std::endl;
@@ -55,4 +54,20 @@ void Monster::moveToward(const sf::Vector2f& target, float speed) {
 sf::Vector2f Monster::getPosition() {
     if (sprite.has_value()) return sprite->getPosition();
     return { 0.f, 0.f };
+}
+
+MonsterInfo getRandomMonsterInfo() {
+    static const std::array<MonsterInfo, 7> monsterTypes = {{
+        {"Sprite-Capa-stand.png", 8},
+        {"Sprite-IC-stand.png", 5},
+        {"StackOverflow-Sheet.png", 5}
+        ,{"Sprite-0002.png", 2},
+        {"Sprite-0001.png", 2},
+        {"Error-Sheet.png", 5},
+        {"Bug-Sheet", 4}
+    }};
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dist(0, monsterTypes.size() - 1);
+    return monsterTypes[dist(gen)];
 }

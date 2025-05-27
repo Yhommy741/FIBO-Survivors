@@ -21,6 +21,15 @@ Game::Game(int argc, char* argv[])
     map = std::make_unique<Map>("GrassTile.png", exeDir);
     monster = std::make_unique<Monster>("Sprite-Capa-stand.png", exeDir, 4);
     monster->randomSpawn(player->getPosition());
+
+    // สร้าง monster หลายตัว
+    int monsterCount = 5; // จำนวนที่ต้องการ
+    for (int i = 0; i < monsterCount; ++i) {
+        MonsterInfo info = getRandomMonsterInfo();
+        auto m = std::make_unique<Monster>(info.fileName, exeDir, info.numFrames);
+        m->randomSpawn(player->getPosition());
+        monsters.push_back(std::move(m));
+    }
 }
 
 void Game::init()
@@ -92,14 +101,26 @@ void Game::updatePlaying()
     view.setCenter(player->getPosition());
     window.setView(view);
 
-	map->draw(window,player->getPosition());
+    map->draw(window, player->getPosition());
     player->animate(deltaTime);
-	player->move(userInput.up, userInput.down, userInput.left, userInput.right);
+    player->move(userInput.up, userInput.down, userInput.left, userInput.right);
     player->draw(window);
-	
-    monster->animate(deltaTime);
-    monster->moveToward(player->getPosition(), 2.f);
-    monster->draw(window);
+
+    // Spawn monster ใหม่ทุก ๆ monsterSpawnInterval วินาที
+    if (monsterSpawnClock.getElapsedTime().asSeconds() >= monsterSpawnInterval) {
+        MonsterInfo info = getRandomMonsterInfo();
+        auto m = std::make_unique<Monster>(info.fileName, exeDir, info.numFrames);
+        m->randomSpawn(player->getPosition());
+        monsters.push_back(std::move(m));
+        monsterSpawnClock.restart();
+    }
+
+    // วนลูปทุก monster
+    for (auto& m : monsters) {
+        m->animate(deltaTime);
+        m->moveToward(player->getPosition(), 2.f);
+        m->draw(window);
+    }
 }
 
 void Game::updateGameOver() 
@@ -114,3 +135,5 @@ void Game::run()
         update();
     }
 }
+
+

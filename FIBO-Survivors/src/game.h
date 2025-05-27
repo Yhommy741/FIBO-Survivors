@@ -2,6 +2,7 @@
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
+#include <SFML/System/Clock.hpp>
 #include <filesystem>
 #include <vector>
 #include <memory>
@@ -36,11 +37,14 @@ private:
    GameState gameState = PLAYING;  
 
    sf::Clock clock;
+   sf::Clock monsterSpawnClock;
+   float monsterSpawnInterval = 0.5f; // วินาทีที่ต้องการ spawn ใหม่
 
    Input userInput;  
 
    std::unique_ptr<Player> player;
    std::unique_ptr<Map> map;
+   std::vector<std::unique_ptr<Monster>> monsters; // เปลี่ยนจาก unique_ptr<Monster> monster;
    
 
    void update();  
@@ -53,4 +57,4 @@ public:
    Game(int argc, char* argv[]);  
    void init();  
    void run();  
-};    
+};
