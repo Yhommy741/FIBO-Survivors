@@ -19,21 +19,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\bullet.h" />
     <ClInclude Include="src\entity.h" />
     <ClInclude Include="src\game.h" />
-    <ClInclude Include="src\helper.h" />
-    <ClInclude Include="src\monster.h" />
-    <ClInclude Include="src\skill.h" />
+    <ClInclude Include="src\map.h" />
+    <ClInclude Include="src\player.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\bullet.cpp" />
     <ClCompile Include="src\entity.cpp" />
     <ClCompile Include="src\game.cpp" />
-    <ClCompile Include="src\helper.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\monster.cpp" />
-    <ClCompile Include="src\skill.cpp" />
+    <ClCompile Include="src\map.cpp" />
+    <ClCompile Include="src\player.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

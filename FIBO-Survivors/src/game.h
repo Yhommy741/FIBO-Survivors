@@ -6,6 +6,8 @@
 #include <vector>
 #include <memory>
 #include "entity.h"
+#include "player.h"
+#include "map.h"
 
 enum GameState {
     PLAYING,
@@ -32,9 +34,12 @@ private:
 
    GameState gameState = PLAYING;  
 
+   sf::Clock clock;
+
    Input userInput;  
 
-   std::unique_ptr<Entity> player;
+   std::unique_ptr<Player> player;
+   std::unique_ptr<Map> map;
    
 
    void update();  

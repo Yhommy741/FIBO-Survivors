@@ -1,8 +1,11 @@
+#pragma once
 #include "game.h"
 #include <cmath>
 #include <algorithm>
 #include <iostream>
 #include "entity.h"
+#include "player.h"
+#include "map.h"
 
 Game::Game(int argc, char* argv[])
     : userInput{ false, false, false, false, false, false } // Initialize userInput
@@ -11,8 +14,9 @@ Game::Game(int argc, char* argv[])
     exePath = std::filesystem::path(argv[0]);
     exeDir = exePath.parent_path();
 
-    // Initialize player with exeDir  
-    player = std::make_unique<Entity>("FIBOGoose.png", exeDir);
+    // Initialize player 
+    player = std::make_unique<Player>("FIBOGoose.png", exeDir,4);
+    map = std::make_unique<Map>("GrassTile.png", exeDir);
 }
 
 void Game::init()
@@ -21,6 +25,9 @@ void Game::init()
     window.setFramerateLimit(60);
     window.setVerticalSyncEnabled(true);
 
+    view.setSize({ 1920.f, 1080.f });
+    view.setCenter({ 960.f, 540.f });
+    window.setView(view);
 
 }
 
@@ -76,6 +83,14 @@ void Game::update()
 
 void Game::updatePlaying() 
 {
+    float deltaTime = clock.restart().asSeconds();
+
+    view.setCenter(player->getPosition());
+    window.setView(view);
+
+	map->draw(window,player->getPosition());
+    player->animate(deltaTime);
+	player->move(userInput.up, userInput.down, userInput.left, userInput.right);
     player->draw(window);
 }
 
