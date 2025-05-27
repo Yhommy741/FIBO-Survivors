@@ -6,6 +6,8 @@
 #include "entity.h"
 #include "player.h"
 #include "map.h"
+#include "monster.h"
+std::unique_ptr<Monster> monster;
 
 Game::Game(int argc, char* argv[])
     : userInput{ false, false, false, false, false, false } // Initialize userInput
@@ -17,6 +19,8 @@ Game::Game(int argc, char* argv[])
     // Initialize player 
     player = std::make_unique<Player>("FIBOGoose.png", exeDir,4);
     map = std::make_unique<Map>("GrassTile.png", exeDir);
+    monster = std::make_unique<Monster>("Sprite-Capa-stand.png", exeDir, 4);
+    monster->randomSpawn(player->getPosition());
 }
 
 void Game::init()
@@ -92,6 +96,10 @@ void Game::updatePlaying()
     player->animate(deltaTime);
 	player->move(userInput.up, userInput.down, userInput.left, userInput.right);
     player->draw(window);
+	
+    monster->animate(deltaTime);
+    monster->moveToward(player->getPosition(), 2.f);
+    monster->draw(window);
 }
 
 void Game::updateGameOver() 

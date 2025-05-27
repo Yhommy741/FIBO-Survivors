@@ -30,7 +30,7 @@ void Player::move(bool up, bool down, bool left, bool right) {
 
     }
 
-	direction *= 5.f;
+	direction *= 6.f;
 
     if (sprite.has_value()) {
         sf::Vector2f currentPosition = sprite->getPosition();

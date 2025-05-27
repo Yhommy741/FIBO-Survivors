@@ -8,6 +8,7 @@
 #include "entity.h"
 #include "player.h"
 #include "map.h"
+#include "monster.h"
 
 enum GameState {
     PLAYING,
