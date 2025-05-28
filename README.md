@@ -1,4 +1,4 @@
-﻿ FIBO-Survivors
+﻿ ⬜🟧FIBO-Survivors🟧⬜
 
 A Pixel 2D survival shooter game developed in **C++17** using **SFML 3.0.1**.
 
@@ -6,17 +6,17 @@ Developed by FRAB11 Group 15
 
 	-	นายจักพรรณ	ศรีรอดบาง		67340500005
 	-	นายสยมภู		ทองเนื้อแปด		67340500044
-	-	นายภิรภัทร		กล่อมจิต		67340500061
-	-	นายธนากร		เจริญพงษ์พินิจ	67340500071
+	-	นายภิรภัทร	กล่อมจิต			67340500061
+	-	นายธนากร	เจริญพงษ์พินิจ		67340500071
 
 
-## 🧭 Overview
+## 🧭 Overview 🧭
 
 **FIBO-Survivors** is an action-packed survival game where you control a hero battling endless waves of monsters. Use smooth controls, animated sprites, and fast-paced projectile combat to survive as long as possible. Track your survival time and health as you fight for a high score.
 
 ---
 
-## 📚 Table of Contents
+## 📚 Table of Contents 📚
 
 - [✅ Functional Requirements]
 - [✅ Non-Functional Requirements]
