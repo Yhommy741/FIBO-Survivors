@@ -7,7 +7,7 @@
 #include "player.h"
 #include "map.h"
 #include "monster.h"
-std::unique_ptr<Monster> monster;
+#include "bullet.h"
 
 Game::Game(int argc, char* argv[])
     : userInput{ false, false, false, false, false, false } // Initialize userInput
@@ -106,7 +106,6 @@ void Game::updatePlaying()
     player->move(userInput.up, userInput.down, userInput.left, userInput.right);
     player->draw(window);
 
-    // Spawn monster ใหม่ทุก ๆ monsterSpawnInterval วินาที
     if (monsterSpawnClock.getElapsedTime().asSeconds() >= monsterSpawnInterval) {
         MonsterInfo info = getRandomMonsterInfo();
         auto m = std::make_unique<Monster>(info.fileName, exeDir, info.numFrames);
@@ -115,11 +114,51 @@ void Game::updatePlaying()
         monsterSpawnClock.restart();
     }
 
-    // วนลูปทุก monster
     for (auto& m : monsters) {
         m->animate(deltaTime);
         m->moveToward(player->getPosition(), 2.f);
         m->draw(window);
+    }
+
+    if (bulletClock.getElapsedTime().asSeconds() >= bulletSpawnInterval) {
+        sf::Vector2i mousePosScreen = sf::Mouse::getPosition(window);
+        sf::Vector2f mousePosWorld = window.mapPixelToCoords(mousePosScreen);
+        sf::Vector2f playerPos = player->getPosition();
+        sf::Vector2f direction = mousePosWorld - playerPos;
+
+        bullets.push_back(std::make_unique<Bullet>(exeDir, playerPos, direction));
+        bulletClock.restart();
+    }
+
+    for (auto it = bullets.begin(); it != bullets.end();) {
+        (*it)->update(deltaTime);
+        (*it)->draw(window);
+
+        // Remove if dead
+        if ((*it)->isDead()) {
+            it = bullets.erase(it);
+        }
+        else {
+            ++it;
+        }
+    }
+
+    for (auto bulletIt = bullets.begin(); bulletIt != bullets.end();) {
+        bool bulletRemoved = false;
+
+        for (auto monsterIt = monsters.begin(); monsterIt != monsters.end();) {
+            if ((*bulletIt)->getBounds().findIntersection((*monsterIt)->getBounds())) {
+                bulletIt = bullets.erase(bulletIt);
+                monsterIt = monsters.erase(monsterIt);
+                bulletRemoved = true;
+                break; // break out of monster loop
+            }
+            else {
+                ++monsterIt;
+            }
+        }
+
+        if (!bulletRemoved) ++bulletIt;
     }
 }
 

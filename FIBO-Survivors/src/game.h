@@ -10,6 +10,7 @@
 #include "player.h"
 #include "map.h"
 #include "monster.h"
+#include "bullet.h"
 
 enum GameState {
     PLAYING,
@@ -38,14 +39,17 @@ private:
 
    sf::Clock clock;
    sf::Clock monsterSpawnClock;
-   float monsterSpawnInterval = 0.5f; // วินาทีที่ต้องการ spawn ใหม่
+   sf::Clock bulletClock;
+   float monsterSpawnInterval = 0.4f;
+   float bulletSpawnInterval = 0.5f;
 
    Input userInput;  
 
    std::unique_ptr<Player> player;
    std::unique_ptr<Map> map;
-   std::vector<std::unique_ptr<Monster>> monsters; // เปลี่ยนจาก unique_ptr<Monster> monster;
-   
+   std::unique_ptr<Monster> monster;
+   std::vector<std::unique_ptr<Monster>> monsters;
+   std::vector<std::unique_ptr<Bullet>> bullets;
 
    void update();  
    void userInputSystem();  

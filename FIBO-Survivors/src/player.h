@@ -11,5 +11,5 @@ public:
     Player(std::string fileName_, const std::filesystem::path& exeDir_, int numFrames);
 
     void move(bool up, bool down, bool left, bool right);
-    sf::Vector2f getPosition();
+    
 };

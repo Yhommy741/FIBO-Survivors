@@ -10,7 +10,7 @@ void Entity::initialize() {
 }
 
 void Entity::load() {
-    std::filesystem::path assetPath = exeDir / ".." / ".." / "assets" / "entity" / "player" / fileName;
+    std::filesystem::path assetPath = exeDir / ".." / ".." / "assets" / "entity" / fileName;
     assetPath = std::filesystem::weakly_canonical(assetPath);
 
     if (!texture.loadFromFile(assetPath.string())) {
@@ -47,7 +47,18 @@ void Entity::animate(float deltaTime) {
 }
 
 void Entity::draw(sf::RenderWindow& window) {
-    if (sprite) { // Only draw if sprite is initialized
+    if (sprite) { 
         window.draw(*sprite);
     }
+}
+
+sf::Vector2f Entity::getPosition() {
+    if (sprite.has_value()) {
+        return sprite->getPosition();
+    }
+    return { 0.f, 0.f };
+}
+
+sf::FloatRect Entity::getBounds(){
+    return sprite ? sprite->getGlobalBounds() : sf::FloatRect();
 }

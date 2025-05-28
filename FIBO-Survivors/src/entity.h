@@ -28,6 +28,8 @@ public:
     virtual void initialize();
     virtual void load();
     virtual void draw(sf::RenderWindow& window);
-
     virtual void animate(float deltaTime); 
+
+    virtual sf::Vector2f getPosition();
+    virtual sf::FloatRect getBounds();
 };
