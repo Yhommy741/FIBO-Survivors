@@ -11,6 +11,8 @@
 #include "map.h"
 #include "monster.h"
 #include "bullet.h"
+#include "hpbar.h"
+#include "ui.h"
 
 enum GameState {
     PLAYING,
@@ -48,6 +50,8 @@ private:
    std::unique_ptr<Player> player;
    std::unique_ptr<Map> map;
    std::unique_ptr<Monster> monster;
+   std::unique_ptr<HpBar> hpBar;
+   std::unique_ptr<UI> gameOver;
    std::vector<std::unique_ptr<Monster>> monsters;
    std::vector<std::unique_ptr<Bullet>> bullets;
 
@@ -56,6 +60,7 @@ private:
    void renderSystem();  
    void updatePlaying();  
    void updateGameOver();  
+
 
 public:  
    Game(int argc, char* argv[]);  

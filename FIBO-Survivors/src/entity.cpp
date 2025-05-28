@@ -62,3 +62,4 @@ sf::Vector2f Entity::getPosition() {
 sf::FloatRect Entity::getBounds(){
     return sprite ? sprite->getGlobalBounds() : sf::FloatRect();
 }
+

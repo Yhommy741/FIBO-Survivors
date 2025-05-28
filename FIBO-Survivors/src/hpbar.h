@@ -6,7 +6,7 @@
 #include <iostream>
 #include <optional>
 
-class Entity {
+class HpBar {
 protected:
     std::filesystem::path exeDir;
     std::string fileName;
@@ -16,21 +16,18 @@ protected:
 
     // Animation-related members
     sf::IntRect animationFrame;
-    int frameWidth = 32;
+    int frameWidth = 64;
     int frameHeight = 32;
     int totalFrames;
     float frameDuration = 0.1f;
     float elapsedTime = 0.0f;
 
 public:
-    Entity(std::string fileName_, const std::filesystem::path& exeDir_, int numFrames);
+    HpBar(std::string fileName, const std::filesystem::path& exeDir, int numFrames);
 
-    virtual void initialize();
-    virtual void load();
-    virtual void draw(sf::RenderWindow& window);
-    virtual void animate(float deltaTime); 
-
-    virtual sf::Vector2f getPosition();
-    virtual sf::FloatRect getBounds();
-    virtual const std::optional<sf::Sprite>& getSprite()const{return sprite;}
+    void initialize();
+    void load();
+    void draw(sf::RenderWindow& window);
+    void update(sf::Vector2f playerPosition);
+    void animate(int currrntHp);
 };

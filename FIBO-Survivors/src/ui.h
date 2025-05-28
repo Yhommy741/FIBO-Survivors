@@ -6,7 +6,7 @@
 #include <iostream>
 #include <optional>
 
-class Entity {
+class UI {
 protected:
     std::filesystem::path exeDir;
     std::string fileName;
@@ -23,14 +23,11 @@ protected:
     float elapsedTime = 0.0f;
 
 public:
-    Entity(std::string fileName_, const std::filesystem::path& exeDir_, int numFrames);
+    UI(std::string fileName_, const std::filesystem::path& exeDir_, int numFrames);
 
     virtual void initialize();
     virtual void load();
     virtual void draw(sf::RenderWindow& window);
-    virtual void animate(float deltaTime); 
-
     virtual sf::Vector2f getPosition();
-    virtual sf::FloatRect getBounds();
-    virtual const std::optional<sf::Sprite>& getSprite()const{return sprite;}
+
 };
