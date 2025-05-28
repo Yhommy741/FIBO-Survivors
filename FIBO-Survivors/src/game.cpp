@@ -10,6 +10,7 @@
 #include "bullet.h"
 #include "hpbar.h"
 #include "ui.h"
+#include "Timer.h"
 
 Game::Game(int argc, char* argv[])
     : userInput{ false, false, false, false, false, false }
@@ -22,6 +23,7 @@ Game::Game(int argc, char* argv[])
 	hpBar = std::make_unique<HpBar>("HP.png", exeDir, 11); 
     gameOver = std::make_unique<UI>("GameOver.png", exeDir, 0);
     monster = std::make_unique<Monster>("Sprite-Capa-stand.png", exeDir, 4);
+    timer = std::make_unique<Timer>("Timer.png", exeDir, 11);
     monster->randomSpawn(player->getPosition());
 
     int monsterCount = 6; 
@@ -107,6 +109,9 @@ void Game::updatePlaying()
     player->draw(window);
     hpBar->update(player->getPosition());
     hpBar->draw(window);
+
+    timer->update(deltaTime, player->getPosition());
+    timer->draw(window);
 
     if (monsterSpawnClock.getElapsedTime().asSeconds() >= monsterSpawnInterval) {
         MonsterInfo info = getRandomMonsterInfo();

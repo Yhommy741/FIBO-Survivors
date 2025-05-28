@@ -14,6 +14,7 @@
 #include "bullet.h"
 #include "hpbar.h"
 #include "ui.h"
+#include "Timer.h"
 
 //Game status
 enum GameState {
@@ -64,6 +65,7 @@ private:
    std::unique_ptr<UI> gameOver;
    std::vector<std::unique_ptr<Monster>> monsters;
    std::vector<std::unique_ptr<Bullet>> bullets;
+   std::unique_ptr<Timer> timer;
 
    // Handling All game objects rendering and updates
    void update();  

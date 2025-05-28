@@ -26,6 +26,7 @@
     <ClInclude Include="src\map.h" />
     <ClInclude Include="src\monster.h" />
     <ClInclude Include="src\player.h" />
+    <ClInclude Include="src\Timer.h" />
     <ClInclude Include="src\ui.h" />
   </ItemGroup>
   <ItemGroup>
@@ -37,6 +38,7 @@
     <ClCompile Include="src\map.cpp" />
     <ClCompile Include="src\monster.cpp" />
     <ClCompile Include="src\player.cpp" />
+    <ClCompile Include="src\Timer.cpp" />
     <ClCompile Include="src\ui.cpp" />
   </ItemGroup>
   <ItemGroup>
