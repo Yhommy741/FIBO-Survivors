@@ -10,6 +10,10 @@ Developed by FRAB11 Group 15
 	-	นายธนากร	เจริญพงษ์พินิจ		67340500071
 
 
+
+https://github.com/user-attachments/assets/52c7ecc1-d8ed-405a-a959-f23d0f4c4e78
+
+
 ## 🧭 Overview 🧭
 
 **FIBO-Survivors** is an action-packed survival game where you control a hero battling endless waves of monsters. Use smooth controls, animated sprites, and fast-paced projectile combat to survive as long as possible. Track your survival time and health as you fight for a high score.
