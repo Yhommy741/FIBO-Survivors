@@ -18,7 +18,6 @@ void Map::load() {
         return;
     }
 
-    // Create the sprite and set its properties
     sprite = sf::Sprite(texture);
     sprite->setScale({ 0.8, 0.8 });
     sprite->setPosition({ 960.f, 540.f });
@@ -30,11 +29,9 @@ void Map::draw(sf::RenderWindow& window, sf::Vector2f playerPosition) {
     int gridSize = 20;
     int halfGrid = gridSize / 2;
 
-    // Get the size of the tile (after scaling)
     float tileWidth = texture.getSize().x * sprite->getScale().x;
     float tileHeight = texture.getSize().y * sprite->getScale().y;
 
-    // Find the top-left tile index to start drawing
     int startX = static_cast<int>(std::floor(playerPosition.x / tileWidth)) - halfGrid;
     int startY = static_cast<int>(std::floor(playerPosition.y / tileHeight)) - halfGrid;
 

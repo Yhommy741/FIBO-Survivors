@@ -18,10 +18,9 @@ void UI::load() {
         return;
     }
 
-    // Create the sprite and set its properties
     sprite = sf::Sprite(texture);
     sprite->setScale({ 2.f, 2.f });
-	sprite->setOrigin({ 246.f, 176.f }); // Adjust origin to center the sprite
+	sprite->setOrigin({ 246.f, 176.f });
     sprite->setPosition({ 800.f, 440.f });
 }
 

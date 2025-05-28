@@ -1,55 +1,40 @@
-﻿# FIBO-Survivors
+﻿ FIBO-Survivors
 
 A fast-paced 2D survival shooter game developed in **C++17** using **SFML 3.0.1**.
 
 ## 🧭 Overview
 
-**FIBO-Survivors** is an action-packed survival game where you control a hero battling endless waves of monsters. Use smooth controls, animated sprites, and fast-paced projectile combat to survive as long as possible.
+**FIBO-Survivors** is an action-packed survival game where you control a hero battling endless waves of monsters. Use smooth controls, animated sprites, and fast-paced projectile combat to survive as long as possible. Track your survival time and health as you fight for a high score.
 
 ---
 
 ## 📚 Table of Contents
 
-- [🎮 Game Features](#game-features)
 - [🗂️ Project Structure](#project-structure)
 - [🛠️ Prerequisites](#prerequisites)
 - [🏗️ Build Instructions](#build-instructions)
 - [🕹️ How to Play](#how-to-play)
 - [🎯 Controls](#controls)
-- [🧑‍💻 Development Notes](#development-notes)
 
----
 
-## 🎮 Game Features
-
-- **🔫 Dynamic Combat System**  
-  Fire projectiles in any direction with real-time mouse targeting.
-
-- **💀 Increasing Difficulty**  
-  Fight off endless waves of monsters with rising intensity.
-
-- **🎞️ Smooth Animations**  
-  Player and bullet animations rendered from sprite sheets.
-
-- **🎯 Pixel-Perfect Collisions**  
-  Efficient collision detection between bullets and monsters.
-
----
 
 ## 🗂️ Project Structure
 
 ```
 FIBO-Survivors/
-├── src/                 # Source code files
-│   ├── main.cpp         # Entry point
-│   ├── game.h / .cpp    # Main game loop and state management
-│   ├── entity.h / .cpp  # Generic base class for all entities
-│   ├── player.h / .cpp  # Player logic and controls
-│   ├── monster.h / .cpp # Enemy AI and behavior
-│   ├── bullet.h / .cpp  # Projectile logic
-│   └── map.h / .cpp     # Game map / background rendering
-├── assets/              # Sprites, animations, sounds, etc.
-└── README.md            # Project documentation
+├── src/ # Source code files
+│ ├── main.cpp # Entry point
+│ ├── game.h / .cpp # Main game loop and state management
+│ ├── entity.h / .cpp # Generic base class for all entities
+│ ├── player.h / .cpp # Player logic and controls
+│ ├── monster.h / .cpp # Enemy AI and behavior
+│ ├── bullet.h / .cpp # Projectile logic
+│ ├── map.h / .cpp # Game map / background rendering
+│ ├── hpbar.h / .cpp # Health bar UI
+│ ├── ui.h / .cpp # UI elements (Game Over, etc.)
+├── assets/ # Sprites, animations, sounds, fonts, etc.
+│ └── UI/GameOver/ # Game Over image assets
+└── README.md # Project documentation
 ```
 
 ---
@@ -66,7 +51,7 @@ FIBO-Survivors/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourname/FIBO-Survivors.git
+   git clone https://github.com/Yhommy741/FIBO-Survivors
    cd FIBO-Survivors
    ```
 
@@ -91,6 +76,7 @@ FIBO-Survivors/
 3. **Aim** with your mouse — bullets auto-fire toward the mouse.
 4. **Survive** against waves of monsters spawning from all directions.
 5. **Game Over** occurs when the player's health reaches zero.
+6. **Enjoy The Game**
 
 ---
 
@@ -104,15 +90,5 @@ FIBO-Survivors/
 | **D**      | Move Right           |
 | **Mouse**  | Aim bullets (auto-fire) |
 
----
 
-## 🧑‍💻 Development Notes
-
-- All sprites (player, monsters, bullets) are animated using spritesheets exported from **Aseprite**.
-- Collision detection uses bounding box intersection via `sf::FloatRect::intersects()`.
-- Sprites are rotated to match the direction of movement (especially bullets).
-- Easily extensible entity-based architecture for adding new enemies, effects, or powerups.
-
----
-
-Happy coding, and enjoy surviving the monster horde! 👾🔥
+Enjoy surviving In FIBO! 👾🔥

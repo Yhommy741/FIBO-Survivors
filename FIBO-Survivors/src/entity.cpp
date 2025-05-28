@@ -18,7 +18,6 @@ void Entity::load() {
         return;
     }
 
-    // Create the sprite and set its properties
     sprite = sf::Sprite(texture);
     animationFrame = sf::IntRect({ 0, 0 }, { frameWidth, frameHeight });
     sprite->setTextureRect(animationFrame);
@@ -28,20 +27,18 @@ void Entity::load() {
 }
 
 void Entity::animate(float deltaTime) {
-    if (!sprite.has_value()) return; // Check if sprite is initialized
+    if (!sprite.has_value()) return;
 
     elapsedTime += deltaTime;
 
     if (elapsedTime >= frameDuration) {
         elapsedTime -= frameDuration;
 
-        // Move to the next frame
         animationFrame.position.x += frameWidth;
         if (animationFrame.position.x >= frameWidth * totalFrames) {
-            animationFrame.position.x = 0; // Loop back to the first frame
+            animationFrame.position.x = 0;
         }
 
-        // Update the sprite's texture rectangle
         sprite->setTextureRect(animationFrame);
     }
 }

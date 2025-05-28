@@ -19,7 +19,6 @@ void HpBar::load() {
         return;
     }
 
-    // Create the sprite and set its properties
     sprite = sf::Sprite(texture);
     animationFrame = sf::IntRect({ 704, 0 }, { frameWidth, frameHeight });
     sprite->setTextureRect(animationFrame);
@@ -30,18 +29,16 @@ void HpBar::load() {
 }
 
 void HpBar::animate(int currrntHp) {
-    if (!sprite.has_value()) return; // Check if sprite is initialized
+    if (!sprite.has_value()) return;
 
-    // Move to the next frame
     animationFrame.position.x = currrntHp * frameWidth;
 
-    // Update the sprite's texture rectangle
     sprite->setTextureRect(animationFrame);
 
 }
 
 void HpBar::draw(sf::RenderWindow& window) {
-    if (sprite) { // Only draw if sprite is initialized
+    if (sprite) {
         window.draw(*sprite);
     }
 }

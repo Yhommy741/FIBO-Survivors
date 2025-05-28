@@ -12,13 +12,11 @@
 #include "ui.h"
 
 Game::Game(int argc, char* argv[])
-    : userInput{ false, false, false, false, false, false } // Initialize userInput
+    : userInput{ false, false, false, false, false, false }
 {
-    // Initialize exeDir using the executable path  
     exePath = std::filesystem::path(argv[0]);
     exeDir = exePath.parent_path();
 
-    // Initialize player 
     player = std::make_unique<Player>("FIBOGoose.png", exeDir,4);
     map = std::make_unique<Map>("GrassTile.png", exeDir);
 	hpBar = std::make_unique<HpBar>("HP.png", exeDir, 11); 
@@ -26,8 +24,7 @@ Game::Game(int argc, char* argv[])
     monster = std::make_unique<Monster>("Sprite-Capa-stand.png", exeDir, 4);
     monster->randomSpawn(player->getPosition());
 
-    // สร้าง monster หลายตัว
-    int monsterCount = 5; // จำนวนที่ต้องการ
+    int monsterCount = 6; 
     for (int i = 0; i < monsterCount; ++i) {
         MonsterInfo info = getRandomMonsterInfo();
         auto m = std::make_unique<Monster>(info.fileName, exeDir, info.numFrames);
@@ -51,7 +48,6 @@ void Game::init()
 
 void Game::userInputSystem() 
 {
-    // Reset movement input every frame
     userInput.up = false;
     userInput.down = false;
     userInput.left = false;
@@ -59,7 +55,6 @@ void Game::userInputSystem()
     userInput.esc = false;
     userInput.pause = false;
 
-    // Real-time movement polling (smooth movement)
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
         userInput.up = true;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
@@ -141,7 +136,6 @@ void Game::updatePlaying()
         (*it)->update(deltaTime);
         (*it)->draw(window);
 
-        // Remove if dead
         if ((*it)->isDead()) {
             it = bullets.erase(it);
         }
@@ -158,7 +152,7 @@ void Game::updatePlaying()
                 bulletIt = bullets.erase(bulletIt);
                 monsterIt = monsters.erase(monsterIt);
                 bulletRemoved = true;
-                break; // break out of monster loop
+                break;
             }
             else {
                 ++monsterIt;
