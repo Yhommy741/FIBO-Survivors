@@ -1,4 +1,4 @@
-###﻿ ⬜🟧FIBO-Survivors🟧⬜
+ ⬜🟧FIBO-Survivors🟧⬜
 
 A Pixel 2D survival shooter game developed in **C++17** using **SFML 3.0.1**.
 
@@ -25,7 +25,7 @@ Developed by FRAB11 Group 15
 - [🕹️ How to Play]
 - [🎯 Controls]
 
-## ✅ Functional Requirements
+## ✅ Functional Requirements ✅
 
 •	2D Game
 	เกมจะมีมุมมองแบบ 2D โดยใช้กราฟิกแบบพิกเซลอาร์ต
@@ -56,7 +56,7 @@ Developed by FRAB11 Group 15
 	เขียนโค้ดด้วยหลักการ OOP โดยมีคลาสสำหรับผู้เล่น, มอนสเตอร์, กระสุน, แผนที่ และ UI ต่างๆ
 
 
-## ✅ Non-Functional Requirements
+## ✅ Non-Functional Requirements ✅
 
 •	Performance
 	เกมรันได้อย่างน้อย 60 เฟรมต่อวินาที การรับอินพุต การเคลื่อนไหว และการแสดงผลต้องลื่นไหล
@@ -77,7 +77,7 @@ Developed by FRAB11 Group 15
 	เกมต้องบริหารจัดการหน่วยความจำและ resource อย่างมีประสิทธิภาพ โหลด asset เมื่อจำเป็นและไม่เกิด memory leak
 
 
-## 🗂️ Project Structure
+## 🗂️ Project Structure 🗂️
 
 ```
 FIBO-Survivors/
@@ -98,7 +98,7 @@ FIBO-Survivors/
 
 ---
 
-## 🛠️ Prerequisites
+## 🛠️ Prerequisites 🛠️
 
 - A C++17-compatible compiler
 - [SFML 3.0.1](https://www.sfml-dev.org/download.php) properly installed
@@ -106,7 +106,7 @@ FIBO-Survivors/
 
 ---
 
-## 🏗️ Build Instructions
+## 🏗️ Build Instructions 🏗️
 
 1. **Clone the repository**
    ```bash
@@ -126,7 +126,7 @@ FIBO-Survivors/
 
 ---
 
-## 🕹️ How to Play
+## 🕹️ How to Play 🕹️
 
 1. **Start** the game — the player character will spawn in the center.
 2. **Move** using the keyboard (`W`, `A`, `S`, `D`).
@@ -137,7 +137,7 @@ FIBO-Survivors/
 
 ---
 
-## 🎯 Controls
+## 🎯 Controls 🎯
 
 | Key        | Action               |
 |------------|----------------------|
@@ -148,4 +148,4 @@ FIBO-Survivors/
 | **Mouse**  | Aim bullets (auto-fire) |
 
 
-Enjoy surviving In FIBO! 👾🔥
+Enjoy surviving In FIBO! 👾🔥🔥
